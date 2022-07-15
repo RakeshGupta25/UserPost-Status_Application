@@ -1,0 +1,35 @@
+version: '3'
+
+volumes:
+  mysql-room:
+
+services:
+  mysql-database:
+    image: 'mysql:latest'
+   
+    environment:
+      - MYSQL_ROOT_PASSWORD=root
+      - MYSQL_PASSWORD=root
+      - MYSQL_DATABASE=group_post
+    volumes:
+      - mysql-room:/var/lib/mysql
+     # - ./init1:/docker-entrypoint-initdb.d
+      
+    ports:
+      - "3307:3306"
+    
+  docker-container-groupinformation:
+    image: post.jar
+    ports:
+      - "9999:9090"
+   
+    environment:
+      MYSQL_HOST: mysql-database
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql-database:3306/group_post?createDatabaseIfNotExist=true
+      SPRING_DATASOURCE_USERNAME: "root"
+      SPRING_DATASOURCE_PASSWORD: "root"
+    build:
+      context: "./"
+      dockerfile: "Dockerfile"
+    depends_on:
+      - mysql-database
